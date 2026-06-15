@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Random Team Builder</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 30px;
+      color: #222;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .top-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 14px 35px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .role-options {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: #f8fafc;
+      padding: 12px 18px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+
+    .role-options label {
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #eef2ff;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .result h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .team-list {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    .team-member {
+      width: 150px;
+      background: white;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .team-member img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: #f1f1f1;
+    }
+
+    .team-role {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #2563eb;
+      font-size: 16px;
+    }
+
+    .team-name {
+      margin-top: 5px;
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    .error {
+      color: #b91c1c;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .adventure-options {
+      background: #f8fafc;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 25px;
+    }
+
+    .adventure-options h3 {
+      margin: 0 0 15px 0;
+      text-align: center;
+    }
+
+    .adventure-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px 25px;
+    }
+
+    .adventure-grid label {
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background: #2563eb;
+      color: white;
+    }
+
+    td:first-child {
+      text-align: left;
+      font-weight: bold;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    tr.disabled-character {
+      opacity: 0.35;
+      background: #f3f4f6;
+    }
+
+    tr.disabled-character input {
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      .top-section {
+        flex-direction: column;
+      }
+
+      .team-member {
+        width: 130px;
+      }
+
+      .team-member img {
+        width: 100px;
+        height: 100px;
+      }
+
+      .adventure-grid {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 14px;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Random Team Builder</h1>
+
+    <div class="top-section">
+      <button onclick="randomizeTeam()">Randomize</button>
+
+      <div class="role-options">
+        <label>
+          <input type="checkbox" id="use-healer" checked>
+          Healer
+        </label>
+
+        <label>
+          <input type="checkbox" id="use-dps1" checked>
+          DPS 1
+        </label>
+
+        <label>
+          <input type="checkbox" id="use-dps2" checked>
+          DPS 2
+        </label>
+
+        <label>
+          <input type="checkbox" id="use-tank" checked>
+          Tank
+        </label>
+      </div>
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <div id="result" class="result">
+      <h2>Résultat</h2>
+      <div id="team-list" class="team-list"></div>
+    </div>
+
+    <div class="adventure-options">
+      <h3>DLC</h3>
+      <div id="adventure-list" class="adventure-grid"></div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Personnage</th>
+          <th>Healer</th>
+          <th>DPS 1</th>
+          <th>DPS 2</th>
+          <th>Tank</th>
+        </tr>
+      </thead>
+      <tbody id="character-table"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const imageFolder = "image/";
+    const imageExtension = ".webp";
+
+    const adventures = [
+      {
+        name: "Necropolis of the damned",
+        affected: ["Velarion", "Nevermoor"]
+      },
+      {
+        name: "Tulah, The Spider queen",
+        affected: ["Tulah"]
+      },
+      {
+        name: "Sigrun, The valkyrie",
+        affected: ["Sigrun"]
+      },
+      {
+        name: "Bernard, The Alchemist",
+        affected: ["Bernard"]
+      },
+      {
+        name: "Nenukil, The engineer",
+        affected: ["Nenukil"]
+      },
+      {
+        name: "Amelia, The queen",
+        affected: ["Amelia"]
+      },
+      {
+        name: "The wolf wars",
+        affected: ["Yogger"]
+      },
+      {
+        name: "Sand of Uliminin",
+        affected: ["Laia", "Navalea"]
+      }
+    ];
+
+    const characters = [
+      { name: "Magnus", healer: false, dps1: true, dps2: true, tank: true },
+      { name: "Grukli", healer: false, dps1: true, dps2: true, tank: true },
+      { name: "Yogger", healer: false, dps1: true, dps2: true, tank: true },
+      { name: "Heiner", healer: false, dps1: false, dps2: false, tank: true },
+      { name: "Bree", healer: false, dps1: true, dps2: true, tank: true },
+      { name: "Andrin", healer: false, dps1: true, dps2: true, tank: true },
+      { name: "Sylvie", healer: false, dps1: true, dps2: true, tank: false },
+      { name: "Nenukil", healer: false, dps1: true, dps2: true, tank: true },
+      { name: "Thuls", healer: false, dps1: true, dps2: true, tank: false },
+      { name: "Gustav", healer: true, dps1: true, dps2: true, tank: false },
+      { name: "Evelyn", healer: false, dps1: true, dps2: true, tank: false },
+      { name: "Wilbur", healer: false, dps1: true, dps2: true, tank: false },
+      { name: "Amelia", healer: false, dps1: true, dps2: true, tank: false },
+      { name: "Cornelius", healer: false, dps1: true, dps2: true, tank: false },
+      { name: "Zek", healer: false, dps1: true, dps2: true, tank: false },
+      { name: "Reginald", healer: true, dps1: true, dps2: true, tank: false },
+      { name: "Malukah", healer: true, dps1: true, dps2: true, tank: false },
+      { name: "Tulah", healer: true, dps1: true, dps2: true, tank: false },
+      { name: "Ottis", healer: true, dps1: true, dps2: true, tank: false },
+      { name: "Nezglekt", healer: true, dps1: true, dps2: true, tank: false },
+      { name: "Navalea", healer: false, dps1: true, dps2: true, tank: false },
+      { name: "Bernard", healer: true, dps1: true, dps2: true, tank: false },
+      { name: "Nevermoor", healer: true, dps1: true, dps2: true, tank: false },
+      { name: "Nyrada", healer: false, dps1: true, dps2: true, tank: false },
+      { name: "Laia", healer: false, dps1: true, dps2: true, tank: true },
+      { name: "Sigrun", healer: true, dps1: true, dps2: true, tank: false },
+      { name: "Velarion", healer: true, dps1: true, dps2: true, tank: false }
+    ];
+
+    const tableBody = document.getElementById("character-table");
+    const adventureList = document.getElementById("adventure-list");
+
+    adventures.forEach((adventure, index) => {
+      const label = document.createElement("label");
+
+      label.innerHTML = `
+        <input 
+          type="checkbox" 
+          class="adventure-checkbox"
+          data-index="${index}"
+          checked
+        >
+        ${adventure.name}
+      `;
+
+      adventureList.appendChild(label);
+    });
+
+    characters.forEach(character => {
+      const row = document.createElement("tr");
+      row.dataset.name = character.name;
+
+      row.innerHTML = `
+        <td>${character.name}</td>
+
+        <td>
+          <input 
+            type="checkbox" 
+            data-name="${character.name}" 
+            data-role="healer"
+            ${character.healer ? "checked" : ""}
+          >
+        </td>
+
+        <td>
+          <input 
+            type="checkbox" 
+            data-name="${character.name}" 
+            data-role="dps1"
+            ${character.dps1 ? "checked" : ""}
+          >
+        </td>
+
+        <td>
+          <input 
+            type="checkbox" 
+            data-name="${character.name}" 
+            data-role="dps2"
+            ${character.dps2 ? "checked" : ""}
+          >
+        </td>
+
+        <td>
+          <input 
+            type="checkbox" 
+            data-name="${character.name}" 
+            data-role="tank"
+            ${character.tank ? "checked" : ""}
+          >
+        </td>
+      `;
+
+      tableBody.appendChild(row);
+    });
+
+    document.querySelectorAll(".adventure-checkbox").forEach(checkbox => {
+      checkbox.addEventListener("change", updateDisabledCharacters);
+    });
+
+    function getBlockedCharacters() {
+      const blocked = new Set();
+
+      document.querySelectorAll(".adventure-checkbox").forEach(checkbox => {
+        const index = Number(checkbox.dataset.index);
+        const adventure = adventures[index];
+
+        if (!checkbox.checked) {
+          adventure.affected.forEach(name => blocked.add(name));
+        }
+      });
+
+      return blocked;
+    }
+
+    function updateDisabledCharacters() {
+      const blockedCharacters = getBlockedCharacters();
+
+      characters.forEach(character => {
+        const row = document.querySelector(`tr[data-name="${character.name}"]`);
+        const inputs = document.querySelectorAll(`input[data-name="${character.name}"]`);
+
+        if (blockedCharacters.has(character.name)) {
+          row.classList.add("disabled-character");
+
+          inputs.forEach(input => {
+            input.disabled = true;
+          });
+        } else {
+          row.classList.remove("disabled-character");
+
+          inputs.forEach(input => {
+            input.disabled = false;
+          });
+        }
+      });
+    }
+
+    function getSelectedCharacters(role) {
+      return Array.from(document.querySelectorAll(`input[data-role="${role}"]:checked:not(:disabled)`))
+        .map(input => input.dataset.name);
+    }
+
+    function pickRandom(list, usedNames) {
+      const available = list.filter(name => !usedNames.includes(name));
+
+      if (available.length === 0) {
+        return null;
+      }
+
+      const randomIndex = Math.floor(Math.random() * available.length);
+      return available[randomIndex];
+    }
+
+    function getImagePath(characterName) {
+      return imageFolder + characterName + "Thumb" + imageExtension;
+    }
+
+    function createTeamMember(role, name) {
+      return `
+        <div class="team-member">
+          <img src="${getImagePath(name)}" alt="${name}">
+          <div class="team-role">${role}</div>
+          <div class="team-name">${name}</div>
+        </div>
+      `;
+    }
+
+    function randomizeTeam() {
+      const error = document.getElementById("error");
+      const result = document.getElementById("result");
+      const teamList = document.getElementById("team-list");
+
+      error.textContent = "";
+      result.style.display = "none";
+      teamList.innerHTML = "";
+
+      const useHealer = document.getElementById("use-healer").checked;
+      const useDps1 = document.getElementById("use-dps1").checked;
+      const useDps2 = document.getElementById("use-dps2").checked;
+      const useTank = document.getElementById("use-tank").checked;
+
+      const usedNames = [];
+      const finalTeam = [];
+
+      if (useHealer) {
+        const healers = getSelectedCharacters("healer");
+        const healer = pickRandom(healers, usedNames);
+
+        if (!healer) {
+          error.textContent = "Il faut au moins 1 healer sélectionné et disponible.";
+          return;
+        }
+
+        usedNames.push(healer);
+        finalTeam.push({ role: "Healer", name: healer });
+      }
+
+      if (useDps1) {
+        const dps1List = getSelectedCharacters("dps1");
+        const dps1 = pickRandom(dps1List, usedNames);
+
+        if (!dps1) {
+          error.textContent = "Il faut au moins 1 DPS 1 sélectionné et disponible.";
+          return;
+        }
+
+        usedNames.push(dps1);
+        finalTeam.push({ role: "DPS 1", name: dps1 });
+      }
+
+      if (useDps2) {
+        const dps2List = getSelectedCharacters("dps2");
+        const dps2 = pickRandom(dps2List, usedNames);
+
+        if (!dps2) {
+          error.textContent = "Il faut au moins 1 DPS 2 sélectionné et disponible.";
+          return;
+        }
+
+        usedNames.push(dps2);
+        finalTeam.push({ role: "DPS 2", name: dps2 });
+      }
+
+      if (useTank) {
+        const tanks = getSelectedCharacters("tank");
+        const tank = pickRandom(tanks, usedNames);
+
+        if (!tank) {
+          error.textContent = "Il faut au moins 1 tank sélectionné et disponible.";
+          return;
+        }
+
+        usedNames.push(tank);
+        finalTeam.push({ role: "Tank", name: tank });
+      }
+
+      if (finalTeam.length === 0) {
+        error.textContent = "Tu dois sélectionner au moins un rôle : Healer, DPS 1, DPS 2 ou Tank.";
+        return;
+      }
+
+      teamList.innerHTML = finalTeam
+        .map(member => createTeamMember(member.role, member.name))
+        .join("");
+
+      result.style.display = "block";
+    }
+
+    updateDisabledCharacters();
+  </script>
+</body>
+</html>
