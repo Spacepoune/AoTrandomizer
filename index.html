@@ -138,6 +138,36 @@
       margin: 0 0 15px 0;
       text-align: center;
     }
+    .dlc-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .small-button {
+      padding: 8px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    .small-button:hover {
+      background: #1d4ed8;
+    }
+    
+    .small-button.secondary {
+      background: #64748b;
+    }
+    
+    .small-button.secondary:hover {
+      background: #475569;
+    }
 
     .adventure-grid {
       display: grid;
@@ -258,6 +288,12 @@
 
     <div class="adventure-options">
       <h3>DLC</h3>
+    
+      <div class="dlc-actions">
+        <button type="button" class="small-button" onclick="selectAllDLC()">Tout sélectionner</button>
+        <button type="button" class="small-button secondary" onclick="selectNoDLC()">Tout désélectionner</button>
+      </div>
+    
       <div id="adventure-list" class="adventure-grid"></div>
     </div>
 
@@ -562,7 +598,22 @@
 
       result.style.display = "block";
     }
-
+    function selectAllDLC() {
+      document.querySelectorAll(".adventure-checkbox").forEach(checkbox => {
+        checkbox.checked = true;
+      });
+    
+      updateDisabledCharacters();
+    }
+    
+    function selectNoDLC() {
+      document.querySelectorAll(".adventure-checkbox").forEach(checkbox => {
+        checkbox.checked = false;
+      });
+    
+      updateDisabledCharacters();
+    }
+    
     updateDisabledCharacters();
   </script>
 </body>
